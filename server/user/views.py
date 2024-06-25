@@ -5,6 +5,7 @@ from rest_framework import exceptions as rest_exceptions, response, decorators a
 from rest_framework_simplejwt import tokens, views as jwt_views, serializers as jwt_serializers, exceptions as jwt_exceptions
 from user import serializers, models
 import stripe
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 prices = {
@@ -25,6 +26,10 @@ def get_user_tokens(user):
     }
 
 
+@extend_schema(
+    request=serializers.LoginSerializer,
+    responses={200: "Login successful. Tokens returned in cookies.", 401: "Authentication failed."}
+)
 @rest_decorators.api_view(["POST"])
 @rest_decorators.permission_classes([])
 def loginView(request):
@@ -64,6 +69,10 @@ def loginView(request):
         "Email or Password is incorrect!")
 
 
+@extend_schema(
+    request=serializers.RegistrationSerializer,
+    responses={201: "Registered successfully.", 400: "Invalid data."}
+)
 @rest_decorators.api_view(["POST"])
 @rest_decorators.permission_classes([])
 def registerView(request):
@@ -77,6 +86,9 @@ def registerView(request):
     return rest_exceptions.AuthenticationFailed("Invalid credentials!")
 
 
+@extend_schema(
+    responses={200: "Logged out successfully.", 400: "Invalid token."}
+)
 @rest_decorators.api_view(['POST'])
 @rest_decorators.permission_classes([rest_permissions.IsAuthenticated])
 def logoutView(request):
@@ -129,6 +141,9 @@ class CookieTokenRefreshView(jwt_views.TokenRefreshView):
         return super().finalize_response(request, response, *args, **kwargs)
 
 
+@extend_schema(
+    responses={200: serializers.UserSerializer, 404: "User not found.", 401: "Unauthorized"}
+)
 @rest_decorators.api_view(["GET"])
 @rest_decorators.permission_classes([rest_permissions.IsAuthenticated])
 def user(request):
@@ -141,6 +156,9 @@ def user(request):
     return response.Response(serializer.data)
 
 
+@extend_schema(
+    responses={200: "Subscriptions retrieved successfully.", 404: "User not found."}
+)
 @rest_decorators.api_view(["GET"])
 @rest_decorators.permission_classes([rest_permissions.IsAuthenticated])
 def getSubscriptions(request):

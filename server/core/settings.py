@@ -53,10 +53,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Modules
     'corsheaders',
     'rest_framework',
+    'drf_spectacular',
     'rest_framework_simplejwt.token_blacklist',
 
     # Apps
@@ -200,7 +201,7 @@ SIMPLE_JWT = {
     # A string like "example.com", or None for standard domain cookie.
     'AUTH_COOKIE_DOMAIN': None,
     # Whether the auth cookies should be secure (https:// only).
-    'AUTH_COOKIE_SECURE': True, 
+    'AUTH_COOKIE_SECURE': True,
     # Http only cookie flag.It's not fetch by javascript.
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_PATH': '/',        # The path of the auth cookie.
@@ -217,7 +218,25 @@ REST_FRAMEWORK = {
 
     "DEFAULT_PERMISSION_CLASSES": [
         'rest_framework.permissions.AllowAny',
-    ]
+    ],
+
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+#######################
+#       OPENAPI       #
+#######################
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Challenge API",
+    "DESCRIPTION": "",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SECURITY_DEFINITIONS": {
+        "api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}
+    },
+}
+
+#######################
 
 AUTH_USER_MODEL = 'user.User'
